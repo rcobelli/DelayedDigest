@@ -4,12 +4,12 @@
 <!-- ![Screenshot](screenshot.png) -->
 
 ## What it is
-I, like many others, subscribe to a number of weekly newsletters that are delivered by email. They arrive at random hours throughout the week which can make it difficult to find time to read all of them or they continue to clutter up my inbox. The solution was to build DelayedDigest!
+I, like many others, subscribe to a number of weekly newsletters that are delivered by email. They arrive at random hours throughout the week which can make it difficult to find time to read all of them, or they continue to clutter up my inbox. The solution was to build DelayedDigest!
 
-DelayedDigest is a system where all of the emails are delivered to a AWS SES email address and stored in a S3 bucket. Once a week at a predetermined time, a Lambda function pulls all the emails from the S3 bucket and sends them to my personal inbox.
+DelayedDigest is a system where all the emails are delivered to an AWS SES email address and stored in a S3 bucket. Once a week at a predetermined time, a Lambda function pulls all the emails from the S3 bucket and sends them to my personal inbox.
 
 ## Installation
-1. Verify a email address with AWS SES that you own
+1. Verify an email address with AWS SES that you own
    - In my case, I send all emails going to the `dev.rybel-llc.com` to SES while all the emails to `rybel-llc.com` go to my standard email server
 2. Setup a receiving rule where you save all emails to an S3 bucket
    - In the code, this bucket is called `mail-dump`

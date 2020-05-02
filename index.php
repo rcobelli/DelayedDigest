@@ -1,5 +1,7 @@
 <?php
 
+use Aws\S3\Exception\S3Exception;
+
 include_once("init.php");
 
 ?>
@@ -39,7 +41,11 @@ include_once("init.php");
                 ]);
 
                 $emailParser = new PlancakeEmailParser($object['Body']);
-                echo '<li><a href="email.php?key=' . $key . '">' . $emailParser->getSubject() . "</a></li>";
+                try {
+                    echo '<li><a href="email.php?key=' . $key . '">' . $emailParser->getSubject() . "</a></li>";
+                } catch (Exception $e) {
+                    echo '<li><a href="email.php?key=' . $key . '">Unknown Subject Line</a></li>';
+                }
             }
             echo "</ul>";
         } else {

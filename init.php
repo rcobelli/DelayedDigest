@@ -16,7 +16,6 @@ date_default_timezone_set('America/New_York');
 error_reporting(0);
 
 use Aws\S3\S3Client;
-use Aws\S3\Exception\S3Exception;
 
 $bucket = 'mail-dump';
 

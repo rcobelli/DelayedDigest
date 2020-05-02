@@ -1,5 +1,10 @@
 {
     "require": {
-        "aws/aws-sdk-php": "^3.129"
+        "aws/aws-sdk-php": "^3.129",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "ext-mysqli": "*",
+      "ext-calendar": "*"
     }
 }
