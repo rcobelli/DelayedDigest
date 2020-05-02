@@ -1,5 +1,7 @@
 <?php
 
+use Aws\S3\Exception\S3Exception;
+
 include_once("init.php");
 
 ?>

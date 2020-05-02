@@ -1,5 +1,7 @@
 <?php
 
+use Aws\S3\Exception\S3Exception;
+
 include_once("init.php");
 
 $key = $_GET['key'];
@@ -31,6 +33,8 @@ $key = $_GET['key'];
         $subject = $emailParser->getSubject();
     } catch (S3Exception $e) {
         echo $e->getMessage() . PHP_EOL;
+    } catch (Exception $e) {
+        echo $e;
     }
     ?>
     <div class="container">
