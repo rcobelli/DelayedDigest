@@ -15,18 +15,10 @@ use Aws\S3\S3Client;
 
 $bucket = 'mail-dump';
 
-if (gethostname() == "Ryans-MBP") {
-    $s3 = new S3Client([
-        'version' => 'latest',
-        'region'  => 'us-east-1',
-        'profile' => $ini['AWS_PROFILE']
-    ]);
-} else {
-    putenv('HOME=/Users/ryan');
-    
-    $s3 = new S3Client([
-        'version' => 'latest',
-        'region'  => 'us-east-1'
-    ]);
-}
+putenv('HOME=/Users/ryan');
 
+$s3 = new S3Client([
+    'version' => 'latest',
+    'region'  => 'us-east-1',
+    'profile' => $ini['AWS_PROFILE']
+]);
