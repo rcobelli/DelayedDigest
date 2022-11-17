@@ -2,6 +2,10 @@
 
 $ini = parse_ini_file("config.ini", true)["dg"];
 
+if ($_COOKIE['centerdesk'] != "loggedIn") {
+    die();
+}
+
 require 'vendor/autoload.php';
 require 'PlancakeEmailParser.php';
 
