@@ -2,7 +2,7 @@
 
 $ini = parse_ini_file("config.ini", true)["dg"];
 
-if ($_COOKIE['centerdesk'] != "loggedIn") {
+if ($_SERVER['SERVER_NAME'] == "dev.rybel-llc.com" && $_COOKIE['centerdesk'] != "loggedIn") {
     die();
 }
 
