@@ -1,0 +1,116 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+    A Lambda function that will periodically forward emails from an S3 bucket to the destination email address
+Parameters:
+  LambdaFunctionName:
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9_-]*'
+    Description: The name of the Lambda function to be deployed
+    Default: DelayedDigest
+  SenderEmailAddress:
+    Type: String
+    MinLength: '5'
+    MaxLength: '64'
+    AllowedPattern: '[^@]+@[^@]+\.[^@]+'
+    Description: The email address to forward the emails from
+  DestinationEmailAddress:
+    Type: String
+    MinLength: '5'
+    MaxLength: '64'
+    AllowedPattern: '[^@]+@[^@]+\.[^@]+'
+    Description: The email address to receive the emails at
+  EmailS3BucketName:
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    Description: The S3 bucket to forward emails from
+    
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['',[!Ref LambdaFunctionName, '-LambdaRole']]
+      Description: Managed role for Delayed Digest's forwarder Lambda
+      ManagedPolicyArns:
+        - !Ref LambdaPolicy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      
+  LambdaPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Join ['',[!Ref LambdaFunctionName, '-LambdaPolicy']]
+      Description: Managed policy for Delayed Digest's forwarder Lambda
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+              - 's3:DeleteObject'
+            Resource: !Join ['',['arn:', !Ref AWS::Partition, ':s3:::', !Ref EmailS3BucketName, '*']]
+          - Effect: Allow
+            Action:
+              - 'ses:SendEmail'
+              - 'ses:SendRawEmail'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+            Resource: !Join ['',['arn:', !Ref AWS::Partition, ':logs:', !Ref AWS::Region, ':', !Ref AWS::AccountId, ':log-group:/aws/lambda/', !Ref LambdaFunctionName, ':*']]
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+            Resource: !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:*'
+        
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['',['/aws/lambda/', !Ref LambdaFunctionName]]
+      RetentionInDays: 30
+            
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Delayed Digest Email Forwarder
+      FunctionName: !Ref LambdaFunctionName
+      Handler: index.handler
+      MemorySize: 128
+      Runtime: nodejs16.x
+      Role: !GetAtt 'LambdaRole.Arn'
+      Timeout: 240
+      Environment:
+        Variables:
+          SenderEmail: !Ref SenderEmailAddress
+          DestinationEmail: !Ref DestinationEmailAddress
+          BucketName: !Ref EmailS3BucketName
+      Code: index.js
+    
+  ScheduleRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Schedule for Delayed Digest's Forwarder
+      EventBusName: default
+      Name: !Join ['',[!Ref LambdaFunctionName, '-Scheduler']]
+      ScheduleExpression: cron(0 19 ? * FRI *)
+      State: ENABLED
+      Targets: 
+        - Arn: !GetAtt LambdaFunction.Arn
+          Id: "DelayedDigestLambdaFunction"
+        
+Outputs:
+  CLI:
+    Description: Use this command to manually trigger the forwarder
+    Value: !Sub |
+        aws lambda invoke --function-name ${LambdaFunction} --payload '{"null": "null"}' lambda-output.txt --cli-binary-format raw-in-base64-out
