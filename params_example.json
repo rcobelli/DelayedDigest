@@ -1,0 +1,7 @@
+{
+  "Parameters": {
+    "SenderEmailAddress": "from@example.com",
+    "DestinationEmailAddress": "to@example.com",
+    "EmailS3BucketName": "mail-dump"
+  }
+}

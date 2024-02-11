@@ -7,13 +7,10 @@ I, like many others, subscribe to a number of weekly newsletters that are delive
 DelayedDigest is a system where all the emails are delivered to an AWS SES email address and stored in a S3 bucket. Once a week at a predetermined time, a Lambda function pulls all the emails from the S3 bucket and sends them to my personal inbox.
 
 ## Installation
-1. Verify an email address with AWS SES that you own
-   - In my case, I send all emails going to the `dev.me.com` to SES while all the emails to `me.com` go to my standard email server
-2. Setup a receiving rule where you save all emails to an S3 bucket
-3. Update `params.json` to include your specific setup
-4. Decide on an S3 bucket name to hold your templates & run `aws s3 create-bucket --bucket <BUCKET NAME>`
-5. Run `aws cloudformation package --template-file cfn-template.yml --s3-bucket <STEP 4's BUCKET> --output-template-file template.packaged.yml`
-6. Run `aws cloudformation deploy --template-file template.packaged.yml --stack-name DelayedDigest --parameter-overrides file://params.json --capabilities CAPABILITY_NAMED_IAM`
+1. `cp params_example.json params.json`
+2. Fill in the params in the JSON file
+3. `./deploy.sh`
+  - You can optionally provide a single argument to `deploy.sh` with the AWS profile you'd like to use
 
 ## TODO: 
   1. Create the S3 bucket via CFN

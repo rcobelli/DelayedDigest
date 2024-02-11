@@ -1,1 +1,4 @@
 *.packaged.yml
+*.zip
+package/*
+params.json
