@@ -4,12 +4,12 @@ set -e
 AWS_CLI_PROFILE=${1:-default}
 
 echo "Looking for existing CloudFormation S3 bucket..."
-BUCKET_NAME=$(aws s3api list-buckets --profile $AWS_CLI_PROFILE --output text --query "Buckets[].[Name]" | grep cf-templates)
+BUCKET_NAME=$(aws s3api list-buckets --profile $AWS_CLI_PROFILE --output text --query "Buckets[].[Name]" | grep cf-templates | cat)
 
 if [[ -z "$BUCKET_NAME" ]]; then
    echo "No matches found."
    BUCKET_SUFFIX=$(xxd -l 8 -c 8 -p < /dev/random)
-   BUCKET_NAME="UnsnoozeTrello-${BUCKET_SUFFIX}"
+   BUCKET_NAME="cf-templates-${BUCKET_SUFFIX}"
    echo "Creating new bucket..."
    aws s3api create-bucket --bucket $BUCKET_NAME --profile $AWS_CLI_PROFILE
    echo "Done."
