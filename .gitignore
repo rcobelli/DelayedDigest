@@ -2,3 +2,4 @@
 *.zip
 package/*
 params.json
+node_modules/

@@ -27,6 +27,12 @@ Parameters:
     MinLength: '1'
     MaxLength: '64'
     Description: The S3 bucket to forward emails from
+  DeploymentS3Bucket:
+    Type: String
+    Description: S3 bucket containing the Lambda deployment.zip (created by build.sh)
+  DeploymentS3Key:
+    Type: String
+    Description: S3 object key for the Lambda deployment zip (e.g. path/deployment.zip)
     
 Resources:
   LambdaRole:
@@ -87,7 +93,7 @@ Resources:
       FunctionName: !Ref LambdaFunctionName
       Handler: index.handler
       MemorySize: 128
-      Runtime: nodejs16.x
+      Runtime: nodejs22.x
       Role: !GetAtt 'LambdaRole.Arn'
       Timeout: 240
       Environment:
@@ -95,8 +101,17 @@ Resources:
           SenderEmail: !Ref SenderEmailAddress
           DestinationEmail: !Ref DestinationEmailAddress
           BucketName: !Ref EmailS3BucketName
-      Code: index.js
-    
+      Code:
+        S3Bucket: !Ref DeploymentS3Bucket
+        S3Key: !Ref DeploymentS3Key
+
+  LambdaAsyncInvokeConfig:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Qualifier: $LATEST
+      MaximumRetryAttempts: 0
+
   EventsInvokeLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:

@@ -82,9 +82,6 @@ exports.processMessage = function(data) {
     // These signatures will likely be invalid anyways, since the From
     // header was modified.
     header = header.replace(/^DKIM-Signature: .*\r?\n(\s+.*\r?\n)*/mg, '');
-    
-    
-    data.log({ level: "error", message: header });
 
     data.emailData = header + body;
     return Promise.resolve(data);
@@ -105,7 +102,7 @@ exports.sendMessage = function(data) {
             Data: data.emailData
         }
     };
-    data.log({ level: "info", message: "sendMessage: Sending email via SES. " + "Message to: " + data.config.toEmail + "." });
+    data.log({ level: "info", message: "sendMessage: Sending email via SES" });
     return new Promise(function(resolve, reject) {
         data.ses.sendRawEmail(params, function(err, result) {
             if (err) {
@@ -113,15 +110,16 @@ exports.sendMessage = function(data) {
                     level: "error",
                     message: "sendRawEmail() returned error.",
                     error: err,
-                    stack: err.stack
+                    rawMessage: params.RawMessage.Data
                 });
-                return reject(new Error('Error: Email sending failed.'));
+                // return reject(new Error('Error: Email sending failed.'));
+            } else {
+                data.log({
+                    level: "info",
+                    message: "sendRawEmail() successful.",
+                    result: result
+                });
             }
-            data.log({
-                level: "info",
-                message: "sendRawEmail() successful.",
-                result: result
-            });
             resolve(data);
         });
     });

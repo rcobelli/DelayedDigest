@@ -1,0 +1,14 @@
+{
+    "name": "delayed-digest",
+    "version": "1.0.0",
+    "description": "Delayed Digest Lambda forwarder",
+    "main": "index.js",
+    "scripts": {
+        "build": "rm -f deployment.zip && npm ci --production && zip -r deployment.zip index.js node_modules package.json package-lock.json"
+    },
+    "dependencies": {
+        "aws-sdk": "^2.1350.0",
+        "@aws-sdk/client-s3": "^3.350.0",
+        "@aws-sdk/client-ses": "^3.350.0"
+    }
+}
